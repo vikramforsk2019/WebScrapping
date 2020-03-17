@@ -1,0 +1,104 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2511
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red191\green100\blue37;\red255\green255\blue255;\red153\green168\blue186;
+\red88\green118\blue71;\red109\green109\blue109;\red117\green115\blue185;\red86\green133\blue173;\red152\green54\blue29;
+}
+{\*\expandedcolortbl;;\cssrgb\c79921\c46957\c19137;\cssrgb\c100000\c100000\c100000\c0;\cssrgb\c66409\c71889\c77838;
+\cssrgb\c41608\c52986\c34799;\cssrgb\c50327\c50328\c50265;\cssrgb\c53559\c53471\c77623;\cssrgb\c40804\c59335\c73556;\cssrgb\c66631\c28447\c14656;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 import \cf4 warnings\
+\cf2 import \cf4 pandas \cf2 as \cf4 pd\
+\cf2 import \cf4 requests\
+\cf2 from \cf4 bs4 \cf2 import \cf4 BeautifulSoup\
+\cf2 import \cf4 os\
+\cf2 from \cf4 datetime \cf2 import \cf4 datetime\
+\cf2 import \cf4 traceback\
+warnings.filterwarnings(\cf5 "ignore"\cf4 )\
+\
+\cf6 # Empty lists to store the formatted data\
+\cf4 sold = []\
+price = []\
+url = []\
+price_list = []\
+a = []\
+\cf2 try\cf4 :\
+    \cf6 #Open file containing the URLs\
+    \cf2 with \cf7 open\cf4 (\cf5 'urls.txt'\cf2 , \cf5 'r+'\cf4 )\cf2 as \cf4 f:\
+\
+        \cf6 #Store the URLs in a list\
+        \cf4 data = f.readlines()\
+        \cf6 # print(type(data))\
+        \cf7 print\cf4 (\cf7 str\cf4 (data))\
+        count = \cf8 0\
+        \cf6 #Iterate over the list\
+        \cf2 for \cf4 l \cf2 in \cf4 data:\
+\
+            \cf6 #Replace new line characters while fetching the URLs\
+            \cf4 new_data = l.replace(\cf5 '\cf2 \\n\cf5 '\cf2 , \cf5 ''\cf4 )\
+            count = count + \cf8 1\
+            \cf7 print\cf4 (\cf5 'URL ' \cf4 + \cf7 str\cf4 (count) + \cf5 ': ' \cf4 + \cf7 str\cf4 (new_data))\
+\
+\
+            \cf6 #Append the data to a new list\
+            \cf4 url.append(new_data)\
+\
+            \cf6 #Make Http GET Request to the URL\
+            \cf4 http_req = requests.get(new_data)\
+            soup = BeautifulSoup(http_req.text)\
+\
+            \cf6 #Find respective tags\
+            \cf4 sold_page = soup.findAll(\cf5 "span"\cf2 , \cf4 \{\cf5 "class"\cf4 : \cf5 "pcountsold"\cf4 \})\
+            specialText = soup.find(\cf5 'span'\cf2 , \cf9 class_ \cf4 = \cf5 'specialPriceText'\cf4 )\
+\
+\
+            \cf2 if \cf4 specialText \cf2 is not None\cf4 :\
+                price_val = specialText.getText()\
+                \cf2 if \cf7 str\cf4 (price_val).startswith(\cf5 '\'80'\cf4 ):\
+                    price_val = price_val.replace(\cf5 '\'80\'a0'\cf2 , \cf5 ''\cf4 )\
+\
+            \cf2 else\cf4 :\
+                price_val = soup.find(\cf5 'div'\cf2 , \cf9 class_\cf4 =\cf5 'pprice'\cf4 )\
+                price_val = price_val.contents[\cf8 4\cf4 ]\
+\
+            \cf6 #To replace the ',' with '.' in pricing  - enable the below line of code\
+            # price_val = price_val.replace(',', '.')\
+\
+            \cf4 out = price_val\
+            out2 = sold_page[\cf8 0\cf4 ].getText()\
+\
+            \cf6 # To replace the '.' with ',' in quantities sold -  enable the below line of code\
+            # out2 = out2.replace('.', ',')\
+\
+            \cf4 price.append(out.replace(\cf5 '*'\cf2 ,\cf5 ''\cf4 ).strip())\
+            sold.append(out2)\
+\
+\
+\cf6 # Check if file already exists\
+\cf2 except \cf7 Exception \cf2 as \cf4 e:\
+    \cf7 print\cf4 (\cf7 str\cf4 (e))\
+    \cf7 print\cf4 (traceback.print_exc())\
+\
+\cf2 if \cf4 os.path.isfile(\cf5 'out_data.csv'\cf4 ):\
+    df = pd.read_csv(\cf5 'out_data.csv'\cf4 )\
+\
+\cf6 #Create new file if not created before\
+\cf2 else\cf4 :\
+    df = pd.DataFrame(\cf9 columns \cf4 = [\cf5 'DATE'\cf2 ,\cf5 'SOLD'\cf2 ,\cf5 'PRICE'\cf2 ,\cf5 'URL'\cf4 ])\
+\
+\cf6 #Current Date\
+\cf4 date = datetime.today().strftime(\cf5 '%Y-%m-%d'\cf4 )\
+\
+\cf2 for \cf4 i \cf2 in \cf7 range \cf4 (\cf7 len\cf4 (sold)):\
+    df = df.append(\{\cf5 'DATE'\cf4 : date\cf2 ,\cf5 'SOLD'\cf4 : sold[i]\cf2 , \cf5 'PRICE'\cf4 : price[i]\cf2 , \cf5 'URL'\cf4 : url[i]\}\cf2 , \cf9 ignore_index\cf4 =\cf2 True\cf4 )\
+\cf6 # print(df)\
+\
+#Convert URL to string\
+\cf4 df.URL = df.URL.astype(\cf7 str\cf4 )\
+\
+\cf6 #Create csv output file\
+\cf4 df.to_csv(\cf5 'out_data.csv'\cf2 ,\cf9 index\cf4 =\cf2 False\cf4 )\
+\cf7 print\cf4 (\cf5 'Csv created, kindly check'\cf4 )\
+}

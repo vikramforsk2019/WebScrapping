@@ -1,0 +1,35 @@
+Thank you for showing interest in our data analytics internship program. You’re a shortlisted candidate.
+
+The internship program includes:
+
+    1.Python scraping and generating real-time intelligence 
+    2.Cleaning mass volumes of data
+    3.Performing ETL on volumous data sets (~>30million rows)
+    4.Creating dashboards in Power BI, Tableau and Zoho Analytics using live, real-world data
+
+Stipend: 7,000 per month/-
+Tenure: 2 months
+
+Assignment: As an assignment, please debug the following piece of code.
+
+We’re scraping Mindfactory for:
+    Quantity sold
+    Retail selling price
+
+Here’s the working tableau dashboard.
+https://businessquant.com/amd-and-intel-sales-volume
+
+We’ve linked the code and the list of URLs.
+https://businessquant.com/wp-content/uploads/2020/03/urls.txt
+The challenge is that out of stock items are causing an IndexError.
+
+You may debug and share your submission at support@businessquant.com
+
+If we like your submission, and its timeliness, we will schedule a phone interview to proceed with the internship.
+
+Good Luck!
+
+Piyush Arora
+Founder & CEO
+
+ 
